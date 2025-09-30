@@ -1,3 +1,4 @@
+import 'package:agenda_flutter_chareun/providers/agenda_provider.dart';
 import 'package:agenda_flutter_chareun/providers/login_provider.dart';
 import 'package:agenda_flutter_chareun/screens/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -55,6 +56,9 @@ class _MyHomePageState extends State<MyHomePage> {
       providers: [
         ChangeNotifierProvider(
           create: (context) => LoginProvider(), //Dejamos el provider para mejoras futuras
+        ),
+        ChangeNotifierProvider(
+          create: (context) => AgendaProvider(),
         )
       ],
       child: MaterialApp(
