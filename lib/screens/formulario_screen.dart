@@ -1,6 +1,5 @@
 import 'package:agenda_flutter_chareun/model/contacto.dart';
 import 'package:agenda_flutter_chareun/providers/agenda_provider.dart';
-import 'package:agenda_flutter_chareun/screens/agenda_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -110,10 +109,6 @@ class _FormularioScreen extends State<FormularioScreen> {
     agendaProvider.addContacto(contacto);
     
     mostrarMensaje(context, "Contacto agregado :)", Colors.green, 2);
-    // // Ir a pantalla de agenda
-    // Navigator.push(context, MaterialPageRoute(builder: (context) => const AgendaScreen()));
-
-
   }
 
   void mostrarMensaje(context, String message, color, duracion) {
