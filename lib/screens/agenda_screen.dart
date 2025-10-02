@@ -123,7 +123,6 @@ class _AgendaScreenState extends State<AgendaScreen> {
         : Padding(
             padding: EdgeInsets.all(16.0),
             child: Center(
-              //mainAxisAlignment: MainAxisAlignment.center,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -147,7 +146,6 @@ class _AgendaScreenState extends State<AgendaScreen> {
   }
 
   Future<void> getContactos() async {
-    //contactoFiltro.clear();
     setState(() {
       contactoFiltro = agendaProvider.contactos;
     });
