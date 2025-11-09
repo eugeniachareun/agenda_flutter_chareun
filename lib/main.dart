@@ -1,5 +1,6 @@
 import 'package:agenda_flutter_chareun/providers/agenda_provider.dart';
 import 'package:agenda_flutter_chareun/providers/login_provider.dart';
+import 'package:agenda_flutter_chareun/screens/agenda_screen.dart';
 import 'package:agenda_flutter_chareun/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -49,23 +50,27 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => LoginProvider(), //Dejamos el provider para mejoras futuras
+          create: (context) =>
+              LoginProvider(), //Dejamos el provider para mejoras futuras
         ),
-        ChangeNotifierProvider(
-          create: (context) => AgendaProvider(),
-        )
+        ChangeNotifierProvider(create: (context) => AgendaProvider()),
       ],
       child: MaterialApp(
         title: 'Mi Agenda App',
         debugShowCheckedModeBanner: false,
-        home: const LoginScreen()
-      )
-    );  
+        home: Consumer<LoginProvider>(
+          builder: (context, loginProvider, child) {
+            return loginProvider.isLoggedIn
+                ? const AgendaScreen()    //Si está logueado, muestra directamente la agenda
+                : const LoginScreen(); 
+          },
+        ),
+      ),
+    );
   }
 }

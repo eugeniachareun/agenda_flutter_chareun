@@ -1,5 +1,6 @@
 import 'package:agenda_flutter_chareun/model/contacto.dart';
 import 'package:agenda_flutter_chareun/providers/agenda_provider.dart';
+import 'package:agenda_flutter_chareun/providers/login_provider.dart';
 import 'package:agenda_flutter_chareun/screens/formulario_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -46,7 +47,20 @@ class _AgendaScreenState extends State<AgendaScreen> {
     automaticallyImplyLeading: false,
     elevation: 0.1,
     title: _appBarTitle,
-    actions: <Widget>[IconButton(icon: _searchIcon, onPressed: search)],
+    actions: <Widget>[
+      IconButton(icon: _searchIcon, onPressed: search),
+      IconButton(
+        onPressed: () {
+          final loginProvider = Provider.of<LoginProvider>(
+            context,
+            listen: false,
+          );
+          loginProvider.logout();
+        },
+        icon: const Icon(Icons.logout),
+      ),
+      const SizedBox(width: 20.0),
+    ],
   );
 
   void search() {

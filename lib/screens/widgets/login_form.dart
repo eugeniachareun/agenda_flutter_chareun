@@ -1,5 +1,6 @@
-import 'package:agenda_flutter_chareun/screens/agenda_screen.dart';
+import 'package:agenda_flutter_chareun/providers/login_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -54,11 +55,11 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   void login() {
-    if (_usuarioController.text == 'admin' && _passwordController.text == '123') {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const AgendaScreen()));
-    } else {
+    //Utilizamos LoginProvider para validar las credenciales
+    final loginProvider = Provider.of<LoginProvider>(context, listen: false);
+    loginProvider.login(_usuarioController.text, _passwordController.text).catchError((error) {
       mostrarMensaje(context, "ERROR:  Credenciales incorrectas", Colors.red, 2);
-    }
+    });
   }
 
   void mostrarMensaje(context, String message, color, duracion) {
