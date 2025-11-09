@@ -57,7 +57,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
           );
           loginProvider.logout();
         },
-        icon: const Icon(Icons.logout),
+        icon: const Icon(Icons.logout, color: Colors.white),
       ),
       const SizedBox(width: 20.0),
     ],
@@ -100,6 +100,9 @@ class _AgendaScreenState extends State<AgendaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<AgendaProvider>();
+    provider.cargarContactos();
+
     return Scaffold(
       appBar: topAppBar,
       body: RefreshIndicator(
@@ -149,12 +152,29 @@ class _AgendaScreenState extends State<AgendaScreen> {
   }
 
   Card crearCard(Contacto contacto) {
+    final provider = context.watch<AgendaProvider>();
     return Card(
       child: ListTile(
         leading: Icon(Icons.person),
         title: Text("${contacto.nombre}  ${contacto.apellido}"),
         subtitle: Text(contacto.telefono),
-        trailing: IconButton(onPressed: () {}, icon: Icon(Icons.call)),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                editar(context, contacto);
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () {
+                provider.eliminarContacto(contacto.id!);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -171,6 +191,15 @@ class _AgendaScreenState extends State<AgendaScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const FormularioScreen()),
+    );
+  }
+
+  void editar(BuildContext context, Contacto contacto) {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) => FormularioScreen(contacto: contacto),
+      ),
     );
   }
 }

@@ -1,7 +1,4 @@
-enum Genero {
-  femenino,
-  masculino
-}
+enum Genero { femenino, masculino }
 
 class Contacto {
   static int contador = 0;
@@ -17,11 +14,28 @@ class Contacto {
     required this.apellido,
     required this.telefono,
     required this.domicilio,
-    required this.genero
+    required this.genero,
+  });
+  
+  Contacto.autoincrementar({
+    required this.nombre,
+    required this.apellido,
+    required this.telefono,
+    required this.domicilio,
+    required this.genero,
   }) {
     contador++;
     id = contador;
   }
+
+  Contacto.id({
+    required this.id,
+    required this.nombre,
+    required this.apellido,
+    required this.telefono,
+    required this.domicilio,
+    required this.genero,
+  });
 
   @override
   bool operator ==(Object other) {
@@ -32,8 +46,28 @@ class Contacto {
   @override
   int get hashCode => id.hashCode;
 
-  Contacto copyWith({String? nombre, String? apellido, String? telefono, String? domicilio, Genero? genero}) =>
-      Contacto(nombre: this.nombre, apellido: this.apellido, telefono: this.telefono, domicilio: this.domicilio, genero: this.genero);
+  Contacto copyWith({
+    String? nombre,
+    String? apellido,
+    String? telefono,
+    String? domicilio,
+    Genero? genero,
+  }) => Contacto(
+    nombre: this.nombre,
+    apellido: this.apellido,
+    telefono: this.telefono,
+    domicilio: this.domicilio,
+    genero: this.genero,
+  );
+
+  Map<String, dynamic> toMap() => {
+    "id": id,
+    "nombre": nombre,
+    "apellido": apellido,
+    "telefono": telefono,
+    "domicilio": domicilio,
+    "genero": genero.toString(),
+  };
 
   @override
   String toString() {

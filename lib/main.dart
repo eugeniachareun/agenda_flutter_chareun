@@ -56,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
       providers: [
         ChangeNotifierProvider(
           create: (context) =>
-              LoginProvider(), //Dejamos el provider para mejoras futuras
+              LoginProvider(),
         ),
         ChangeNotifierProvider(create: (context) => AgendaProvider()),
       ],

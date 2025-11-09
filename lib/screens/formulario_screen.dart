@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class FormularioScreen extends StatefulWidget {
-  const FormularioScreen({super.key});
+  const FormularioScreen({super.key, this.contacto});
+
+  //Solo tenemos contacto si estamos editando, si estamos agrengando contacto es nulo
+  final Contacto? contacto;
 
   @override
   State<FormularioScreen> createState() => _FormularioScreen();
@@ -21,14 +24,23 @@ class _FormularioScreen extends State<FormularioScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _nombreController.text = "Bruno";
-    _apellidoController.text = "Díaz";
-    _telefonoController.text = "123456";
-    _domicilioController.text = "Calle Pública 123";
-    
+    final bool isEditing = widget.contacto != null;
+
+    String titulo = "Agregar contacto";
+    if (isEditing) {
+      _nombreController.text = widget.contacto!.nombre;
+      _apellidoController.text = widget.contacto!.apellido;
+      _telefonoController.text = widget.contacto!.telefono;
+      _domicilioController.text = widget.contacto!.domicilio;
+      opcion = widget.contacto!.genero.toString() == Genero.femenino.toString()
+          ? opciones[0]
+          : opciones[1];
+      titulo = "Editar contacto";
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Agregar'),
+        title: Text(titulo),
         actions: [
           IconButton(icon: const Icon(Icons.save), onPressed: () => save()),
         ],
@@ -97,18 +109,31 @@ class _FormularioScreen extends State<FormularioScreen> {
   }
 
   void save() {
+    final bool isEditing = widget.contacto != null;
     AgendaProvider agendaProvider = context.read<AgendaProvider>();
 
-    Contacto contacto = Contacto(
-      nombre: _nombreController.text, 
-      apellido: _apellidoController.text, 
-      telefono: _telefonoController.text, 
-      domicilio: _domicilioController.text, 
-      genero: Genero.values.byName(opcion.toLowerCase())
-    );
-    agendaProvider.addContacto(contacto);
-    
-    mostrarMensaje(context, "Contacto agregado :)", Colors.green, 2);
+    if (isEditing) {
+      Contacto contacto = Contacto.id(
+        id: widget.contacto!.id,
+        nombre: _nombreController.text,
+        apellido: _apellidoController.text,
+        telefono: _telefonoController.text,
+        domicilio: _domicilioController.text,
+        genero: Genero.values.byName(opcion.toLowerCase()),
+      );
+      agendaProvider.actualizarContacto(contacto);
+    } else {
+      Contacto contacto = Contacto.autoincrementar(
+        nombre: _nombreController.text,
+        apellido: _apellidoController.text,
+        telefono: _telefonoController.text,
+        domicilio: _domicilioController.text,
+        genero: Genero.values.byName(opcion.toLowerCase()),
+      );
+      agendaProvider.addContacto(contacto);
+    }
+
+    mostrarMensaje(context, "Contacto guardado :)", Colors.green, 2);
   }
 
   void mostrarMensaje(context, String message, color, duracion) {
@@ -119,7 +144,10 @@ class _FormularioScreen extends State<FormularioScreen> {
         behavior: SnackBarBehavior.floating,
         content: Text(
           message,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
