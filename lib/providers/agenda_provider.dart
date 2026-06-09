@@ -1,4 +1,4 @@
-import 'package:agenda_flutter_chareun/database/contactos_db_helper.dart';
+import 'package:agenda_flutter_chareun/client/agenda_api.dart';
 import 'package:agenda_flutter_chareun/model/contacto.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +7,10 @@ class AgendaProvider extends ChangeNotifier {
   List<Contacto> _contactos = [];
   List<Contacto> get contactos => _contactos;
 
-  AgendaProvider();
+  final AgendaApi _api;
+  String? error;
+
+  AgendaProvider({AgendaApi? api}) : _api = api ?? AgendaApi();
 
   void limpiar() {
     contacto = null;
@@ -15,30 +18,63 @@ class AgendaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  ///------------------
-  /// CRUD CON SQLITE
-  /// Se trabaja con la lista en memoria y con la tabla de SQLite
-  ///------------------
   void cargarContactos() async {
-    _contactos = await ContactosDBHelper.getContactos();
-    notifyListeners();
+     try {
+      final contactsFromApi = await _api.getAll();
+
+      _contactos
+        ..clear()
+        ..addAll(contactsFromApi);
+    } catch (e) {
+      error = e.toString();
+    } finally {
+      notifyListeners();
+    }
   }
 
   void addContacto(Contacto contacto) async {
-    await ContactosDBHelper.insertContacto(contacto);
-    _contactos.add(contacto);
-    notifyListeners();
+    try {
+      await _api.create(contacto);
+      final todos = await _api.getAll();
+
+      _contactos
+        ..clear()
+        ..addAll(todos);
+
+    } catch (e) {
+      error = e.toString();
+    } finally {
+      notifyListeners();
+    }
   }
 
   void actualizarContacto(Contacto contacto) async {
-    await ContactosDBHelper.updateContacto(contacto);
-    _contactos = await ContactosDBHelper.getContactos();
-    notifyListeners();
+    try {
+      await _api.update(contacto);
+      final todos = await _api.getAll();
+
+      _contactos
+        ..clear()
+        ..addAll(todos);
+    } catch (e) {
+      error = e.toString();
+    } finally {
+      notifyListeners();
+    }
   }
 
   void eliminarContacto(int id) async {
-    await ContactosDBHelper.deleteContacto(id);
-    _contactos = await ContactosDBHelper.getContactos();
-    notifyListeners();
+    try {
+      await _api.delete(id);
+      final todos = await _api.getAll();
+
+      _contactos
+        ..clear()
+        ..addAll(todos);
+    } catch (e) {
+      error = e.toString();
+    } finally {
+      notifyListeners();
+    }
   }
 }

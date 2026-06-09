@@ -6,35 +6,27 @@ class Contacto {
   final String nombre;
   final String apellido;
   final String telefono;
-  final String domicilio;
-  final Genero genero;
+  final String? domicilio;
+  final Genero? genero;
+  final String email;
 
   Contacto({
     required this.nombre,
     required this.apellido,
     required this.telefono,
-    required this.domicilio,
-    required this.genero,
+    this.domicilio,
+    this.genero,
+    required this.email,
   });
-  
-  Contacto.autoincrementar({
-    required this.nombre,
-    required this.apellido,
-    required this.telefono,
-    required this.domicilio,
-    required this.genero,
-  }) {
-    contador++;
-    id = contador;
-  }
 
   Contacto.id({
     required this.id,
     required this.nombre,
     required this.apellido,
     required this.telefono,
-    required this.domicilio,
-    required this.genero,
+    this.domicilio,
+    this.genero,
+    required this.email,
   });
 
   @override
@@ -52,12 +44,14 @@ class Contacto {
     String? telefono,
     String? domicilio,
     Genero? genero,
+    String? email,
   }) => Contacto(
     nombre: this.nombre,
     apellido: this.apellido,
     telefono: this.telefono,
     domicilio: this.domicilio,
     genero: this.genero,
+    email: this.email
   );
 
   Map<String, dynamic> toMap() => {
@@ -67,10 +61,11 @@ class Contacto {
     "telefono": telefono,
     "domicilio": domicilio,
     "genero": genero.toString(),
+    "email": email
   };
 
   @override
   String toString() {
-    return '{id: $id,nombre: $nombre, apellido: $apellido, telefono: $telefono, domicilio: $domicilio, genero: $genero}  \n';
+    return '{id: $id,nombre: $nombre, apellido: $apellido, telefono: $telefono, domicilio: $domicilio, genero: $genero, email: $email}  \n';
   }
 }

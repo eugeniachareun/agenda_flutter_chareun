@@ -54,6 +54,7 @@ class ContactosDBHelper {
         telefono: maps[i]['telefono'],
         domicilio: maps[i]['domicilio'],
         genero: maps[i]['genero'] == Genero.femenino.toString() ? Genero.femenino  : Genero.masculino,
+        email: ""
       );
     });
   }

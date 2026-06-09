@@ -170,7 +170,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
             IconButton(
               icon: const Icon(Icons.delete),
               onPressed: () {
-                provider.eliminarContacto(contacto.id!);
+                provider.eliminarContacto(contacto.id);
               },
             ),
           ],

@@ -31,7 +31,7 @@ class _FormularioScreen extends State<FormularioScreen> {
       _nombreController.text = widget.contacto!.nombre;
       _apellidoController.text = widget.contacto!.apellido;
       _telefonoController.text = widget.contacto!.telefono;
-      _domicilioController.text = widget.contacto!.domicilio;
+      _domicilioController.text = widget.contacto!.domicilio ?? "";
       opcion = widget.contacto!.genero.toString() == Genero.femenino.toString()
           ? opciones[0]
           : opciones[1];
@@ -112,7 +112,6 @@ class _FormularioScreen extends State<FormularioScreen> {
     final bool isEditing = widget.contacto != null;
     AgendaProvider agendaProvider = context.read<AgendaProvider>();
 
-    if (isEditing) {
       Contacto contacto = Contacto.id(
         id: widget.contacto!.id,
         nombre: _nombreController.text,
@@ -120,16 +119,13 @@ class _FormularioScreen extends State<FormularioScreen> {
         telefono: _telefonoController.text,
         domicilio: _domicilioController.text,
         genero: Genero.values.byName(opcion.toLowerCase()),
+        email: ""
       );
+
+    if (isEditing) {
+
       agendaProvider.actualizarContacto(contacto);
     } else {
-      Contacto contacto = Contacto.autoincrementar(
-        nombre: _nombreController.text,
-        apellido: _apellidoController.text,
-        telefono: _telefonoController.text,
-        domicilio: _domicilioController.text,
-        genero: Genero.values.byName(opcion.toLowerCase()),
-      );
       agendaProvider.addContacto(contacto);
     }
 

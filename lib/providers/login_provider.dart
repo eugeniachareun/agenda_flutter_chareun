@@ -1,49 +1,43 @@
+import 'package:agenda_flutter_chareun/client/auth_api.dart' show AuthApi;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Plantilla de Provider para mejoras futuras
 class LoginProvider extends ChangeNotifier {
-  String _usuario = '';
+  final String _email = '';
   bool _isLoggedIn = false;
+  final _api = AuthApi();
+  bool _ready = false;
 
-  LoginProvider() {
-    _inicializarDatos();
+  Future<void> init() async {
+    if (_ready) return;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _isLoggedIn = prefs.getBool('isLoggedIn') ?? false;    
+    _ready = true;
+    notifyListeners();
   }
 
   //Getters
-  String get usuario => _usuario;
+  String get email => _email;
   bool get isLoggedIn => _isLoggedIn;
 
-  Future<void> login(String usuario, String password) async {
-    // Validación simple de credenciales (hardcoded)
-    if (usuario == 'admin' && password == '123') {
-      _usuario = usuario;
-      _isLoggedIn = true;
+  Future<void> login(String email, String password) async {
+      final token = await _api.login(email, password);
 
       // Guardar la sesión en SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('usuario', usuario);
+      await prefs.setString('token', token!);
+      await prefs.setString('email', email);
       await prefs.setBool('isLoggedIn', true);
+      _isLoggedIn = true;
       notifyListeners();
-    } else {
-      throw Exception('Credenciales incorrectas');
-    }
   }
 
   Future<void> logout() async {
-    _usuario = '';
-    _isLoggedIn = false;
-    // Borrar la sesión de SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('usuario');
+    await prefs.remove('email');
     await prefs.remove('isLoggedIn');
-    notifyListeners();
-  }
+    await prefs.remove('token');
 
-  Future<void> _inicializarDatos() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _usuario = prefs.getString('usuario') ?? '';
-    _isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-    notifyListeners();
+    _isLoggedIn = false;
   }
 }
