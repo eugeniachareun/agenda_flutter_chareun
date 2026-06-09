@@ -18,7 +18,7 @@ class AgendaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void cargarContactos() async {
+  Future<void> cargarContactos() async {
      try {
       final contactsFromApi = await _api.getAll();
 
@@ -32,7 +32,7 @@ class AgendaProvider extends ChangeNotifier {
     }
   }
 
-  void addContacto(Contacto contacto) async {
+  Future<void> addContacto(Contacto contacto) async {
     try {
       await _api.create(contacto);
       final todos = await _api.getAll();
@@ -48,7 +48,7 @@ class AgendaProvider extends ChangeNotifier {
     }
   }
 
-  void actualizarContacto(Contacto contacto) async {
+  Future<void> actualizarContacto(Contacto contacto) async {
     try {
       await _api.update(contacto);
       final todos = await _api.getAll();
@@ -63,7 +63,7 @@ class AgendaProvider extends ChangeNotifier {
     }
   }
 
-  void eliminarContacto(int id) async {
+  Future<void> eliminarContacto(int id) async {
     try {
       await _api.delete(id);
       final todos = await _api.getAll();

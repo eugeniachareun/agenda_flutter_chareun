@@ -13,30 +13,39 @@ class FormularioScreen extends StatefulWidget {
   State<FormularioScreen> createState() => _FormularioScreen();
 }
 
-final List<String> opciones = ["Femenino", "Masculino"];
-
 class _FormularioScreen extends State<FormularioScreen> {
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _apellidoController = TextEditingController();
   final TextEditingController _telefonoController = TextEditingController();
   final TextEditingController _domicilioController = TextEditingController();
-  String opcion = opciones[0];
+  final TextEditingController _emailController = TextEditingController();
 
   @override
-  Widget build(BuildContext context) {
-    final bool isEditing = widget.contacto != null;
-
-    String titulo = "Agregar contacto";
-    if (isEditing) {
+  void initState() {
+    super.initState();
+    if (widget.contacto != null) {
       _nombreController.text = widget.contacto!.nombre;
       _apellidoController.text = widget.contacto!.apellido;
       _telefonoController.text = widget.contacto!.telefono;
       _domicilioController.text = widget.contacto!.domicilio ?? "";
-      opcion = widget.contacto!.genero.toString() == Genero.femenino.toString()
-          ? opciones[0]
-          : opciones[1];
-      titulo = "Editar contacto";
+      _emailController.text = widget.contacto!.email;
     }
+  }
+
+  @override
+  void dispose() {
+    _nombreController.dispose();
+    _apellidoController.dispose();
+    _telefonoController.dispose();
+    _domicilioController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isEditing = widget.contacto != null;
+    final String titulo = isEditing ? "Editar contacto" : "Agregar contacto";
 
     return Scaffold(
       appBar: AppBar(
@@ -69,38 +78,10 @@ class _FormularioScreen extends State<FormularioScreen> {
               controller: _domicilioController,
               decoration: const InputDecoration(labelText: 'Domicilio'),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Género", style: TextStyle(fontSize: 18)),
-                  ListTile(
-                    title: Text("Femenino"),
-                    leading: Radio(
-                      value: opciones[0],
-                      groupValue: opcion,
-                      onChanged: (valor) {
-                        setState(() {
-                          opcion = valor.toString();
-                        });
-                      },
-                    ),
-                  ),
-                  ListTile(
-                    title: Text("Masculino"),
-                    leading: Radio(
-                      value: opciones[1],
-                      groupValue: opcion,
-                      onChanged: (valor) {
-                        setState(() {
-                          opcion = valor.toString();
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(labelText: 'Email'),
+              keyboardType: TextInputType.emailAddress,
             ),
           ],
         ),
@@ -108,28 +89,40 @@ class _FormularioScreen extends State<FormularioScreen> {
     );
   }
 
-  void save() {
+  void save() async {
     final bool isEditing = widget.contacto != null;
     AgendaProvider agendaProvider = context.read<AgendaProvider>();
 
-      Contacto contacto = Contacto.id(
+    Contacto contacto;
+    if (isEditing) {
+      contacto = Contacto.id(
         id: widget.contacto!.id,
         nombre: _nombreController.text,
         apellido: _apellidoController.text,
         telefono: _telefonoController.text,
         domicilio: _domicilioController.text,
-        genero: Genero.values.byName(opcion.toLowerCase()),
-        email: ""
+        email: _emailController.text,
       );
-
-    if (isEditing) {
-
-      agendaProvider.actualizarContacto(contacto);
     } else {
-      agendaProvider.addContacto(contacto);
+      contacto = Contacto(
+        nombre: _nombreController.text,
+        apellido: _apellidoController.text,
+        telefono: _telefonoController.text,
+        domicilio: _domicilioController.text,
+        email: _emailController.text,
+      );
     }
 
-    mostrarMensaje(context, "Contacto guardado :)", Colors.green, 2);
+    if (isEditing) {
+      await agendaProvider.actualizarContacto(contacto);
+    } else {
+      await agendaProvider.addContacto(contacto);
+    }
+
+    if (mounted) {
+      mostrarMensaje(context, "Contacto guardado :)", Colors.green, 2);
+      Navigator.pop(context);
+    }
   }
 
   void mostrarMensaje(context, String message, color, duracion) {

@@ -23,7 +23,7 @@ class AgendaApi {
     debugPrint('AgendaApi.create statusCode: ${res.statusCode}');
     debugPrint('AgendaApi.create response body: ${res.data}');
 
-    if (res.statusCode != 200) {
+    if (!_isSuccess(res.statusCode)) {
       throw Exception(
         'Error al crear contacto: ${res.data}',
       );
@@ -76,6 +76,7 @@ class AgendaApi {
     final res = await _client.dio.put(
       '/api/contacto/edit/${c.id}',
       data: {
+        'id': c.id,
         'nombre': c.nombre,
         'apellido': c.apellido,
         'telefono': c.telefono,
@@ -132,11 +133,15 @@ class AgendaApi {
       throw Exception('Contacto con formato inesperado');
     }
 
-    return Contacto(
-      //id: (value['id'] ?? value['contactoId'] ?? '').toString(),
+    final idVal = value['id'] ?? value['contactoId'];
+    final idInt = idVal is int ? idVal : int.tryParse(idVal?.toString() ?? '') ?? 0;
+
+    return Contacto.id(
+      id: idInt,
       nombre: (value['nombre'] ?? '').toString(),
       apellido: (value['apellido'] ?? '').toString(),
       telefono: (value['telefono'] ?? '').toString(),
+      domicilio: value['domicilio']?.toString(),
       email: (value['email'] ?? '').toString(),
     );
   }

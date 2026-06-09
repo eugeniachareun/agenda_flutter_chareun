@@ -13,21 +13,23 @@ class AgendaScreen extends StatefulWidget {
 }
 
 class _AgendaScreenState extends State<AgendaScreen> {
-  TextEditingController _filter = TextEditingController();
+  final TextEditingController _filter = TextEditingController();
 
   String _searchText = "";
-  Icon _searchIcon = Icon(Icons.search, color: Colors.white);
+  Icon _searchIcon = const Icon(Icons.search, color: Colors.white);
 
-  List<Contacto> contactoFiltro = <Contacto>[];
+  Widget _appBarTitle = const Text(
+    'Contactos',
+    style: TextStyle(color: Colors.white),
+  );
 
-  late AgendaProvider agendaProvider;
-
-  _AgendaScreenState() {
+  @override
+  void initState() {
+    super.initState();
     _filter.addListener(() {
       if (_filter.text.isEmpty) {
         setState(() {
           _searchText = "";
-          contactoFiltro = agendaProvider.contactos;
         });
       } else {
         setState(() {
@@ -35,12 +37,20 @@ class _AgendaScreenState extends State<AgendaScreen> {
         });
       }
     });
+
+    // Cargar contactos al inicializar la pantalla
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<AgendaProvider>().cargarContactos();
+      }
+    });
   }
 
-  Widget _appBarTitle = Text(
-    'Contactos',
-    style: TextStyle(color: Colors.white),
-  );
+  @override
+  void dispose() {
+    _filter.dispose();
+    super.dispose();
+  }
 
   get topAppBar => AppBar(
     backgroundColor: Colors.green,
@@ -66,15 +76,15 @@ class _AgendaScreenState extends State<AgendaScreen> {
   void search() {
     setState(() {
       if (_searchIcon.icon == Icons.search) {
-        _searchIcon = Icon(Icons.close, color: Colors.white);
+        _searchIcon = const Icon(Icons.close, color: Colors.white);
         _appBarTitle = TextField(
           controller: _filter,
           autofocus: true,
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
-            prefixIcon: Icon(Icons.search, color: Colors.white),
+            prefixIcon: const Icon(Icons.search, color: Colors.white),
             hintText: "Buscar...",
-            hintStyle: TextStyle(color: Colors.white),
+            hintStyle: const TextStyle(color: Colors.white),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,
@@ -83,61 +93,58 @@ class _AgendaScreenState extends State<AgendaScreen> {
           ),
         );
       } else {
-        _searchIcon = Icon(Icons.search, color: Colors.white);
-        _appBarTitle = Text('Contactos', style: TextStyle(color: Colors.white));
-        contactoFiltro = agendaProvider.contactos;
+        _searchIcon = const Icon(Icons.search, color: Colors.white);
+        _appBarTitle = const Text('Contactos', style: TextStyle(color: Colors.white));
         _filter.clear();
       }
     });
   }
 
-  @override
-  Future<void> didChangeDependencies() async {
-    super.didChangeDependencies();
-    agendaProvider = context.watch<AgendaProvider>();
-    getContactos();
+  List<Contacto> get _filteredContactos {
+    final list = context.read<AgendaProvider>().contactos;
+    if (_searchText.isEmpty) {
+      return list;
+    }
+    return list
+        .where(
+          (c) =>
+              (c.nombre.toLowerCase().contains(_searchText.toLowerCase()) ||
+              c.apellido.toLowerCase().contains(_searchText.toLowerCase())),
+        )
+        .toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<AgendaProvider>();
-    provider.cargarContactos();
+    context.watch<AgendaProvider>();
 
     return Scaffold(
       appBar: topAppBar,
       body: RefreshIndicator(
-        onRefresh: getContactos,
-        child: Container(child: _construirLista()),
+        onRefresh: () => context.read<AgendaProvider>().cargarContactos(),
+        child: _construirLista(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => agregar(context),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
 
   Widget _construirLista() {
-    if (_searchText.isNotEmpty) {
-      contactoFiltro = agendaProvider.contactos
-          .where(
-            (c) =>
-                (c.nombre.toLowerCase().contains(_searchText.toLowerCase()) ||
-                c.apellido.toLowerCase().contains(_searchText.toLowerCase())),
-          )
-          .toList();
-    }
+    final listToShow = _filteredContactos;
 
-    return contactoFiltro.isNotEmpty
+    return listToShow.isNotEmpty
         ? ListView.builder(
-            padding: EdgeInsets.only(bottom: 60.0),
-            itemCount: contactoFiltro.length,
+            padding: const EdgeInsets.only(bottom: 60.0),
+            itemCount: listToShow.length,
             itemBuilder: (BuildContext context, int index) {
-              return crearCard(contactoFiltro[index]);
+              return crearCard(listToShow[index]);
             },
           )
-        : Padding(
+        : const Padding(
             padding: EdgeInsets.all(16.0),
             child: Center(
               child: Column(
@@ -152,10 +159,9 @@ class _AgendaScreenState extends State<AgendaScreen> {
   }
 
   Card crearCard(Contacto contacto) {
-    final provider = context.watch<AgendaProvider>();
     return Card(
       child: ListTile(
-        leading: Icon(Icons.person),
+        leading: const Icon(Icons.person),
         title: Text("${contacto.nombre}  ${contacto.apellido}"),
         subtitle: Text(contacto.telefono),
         trailing: Row(
@@ -170,19 +176,13 @@ class _AgendaScreenState extends State<AgendaScreen> {
             IconButton(
               icon: const Icon(Icons.delete),
               onPressed: () {
-                provider.eliminarContacto(contacto.id);
+                context.read<AgendaProvider>().eliminarContacto(contacto.id);
               },
             ),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> getContactos() async {
-    setState(() {
-      contactoFiltro = agendaProvider.contactos;
-    });
   }
 
   void more() {}

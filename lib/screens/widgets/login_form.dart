@@ -18,9 +18,14 @@ class _LoginFormState extends State<LoginForm> {
   final TextEditingController _passwordController = TextEditingController();
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     _usuarioController.text = "admin";
     _passwordController.text = "123";
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -49,6 +54,13 @@ class _LoginFormState extends State<LoginForm> {
             },
             child: const Text('Iniciar Sesión'),
           ),
+          const SizedBox(height: 10),
+          TextButton(
+            onPressed: () {
+              register();
+            },
+            child: const Text('Registrarse'),
+          ),
         ],
       ),
     );
@@ -59,6 +71,19 @@ class _LoginFormState extends State<LoginForm> {
     final loginProvider = Provider.of<LoginProvider>(context, listen: false);
     loginProvider.login(_usuarioController.text, _passwordController.text).catchError((error) {
       mostrarMensaje(context, "ERROR:  Credenciales incorrectas", Colors.red, 2);
+    });
+  }
+
+  void register() {
+    final loginProvider = Provider.of<LoginProvider>(context, listen: false);
+    loginProvider.register(_usuarioController.text, _passwordController.text).then((success) {
+      if (success) {
+        mostrarMensaje(context, "Usuario registrado con éxito! Ya podés iniciar sesión.", Colors.green, 3);
+      } else {
+        mostrarMensaje(context, "ERROR: No se pudo registrar el usuario", Colors.red, 3);
+      }
+    }).catchError((error) {
+      mostrarMensaje(context, "ERROR: No se pudo registrar el usuario", Colors.red, 3);
     });
   }
 

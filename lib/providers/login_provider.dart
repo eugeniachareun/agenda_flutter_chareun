@@ -39,5 +39,10 @@ class LoginProvider extends ChangeNotifier {
     await prefs.remove('token');
 
     _isLoggedIn = false;
+    notifyListeners();
+  }
+
+  Future<bool> register(String email, String password) async {
+    return await _api.register(email, password);
   }
 }

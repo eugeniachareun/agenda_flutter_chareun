@@ -1,5 +1,3 @@
-enum Genero { femenino, masculino }
-
 class Contacto {
   static int contador = 0;
   late int id;
@@ -7,7 +5,6 @@ class Contacto {
   final String apellido;
   final String telefono;
   final String? domicilio;
-  final Genero? genero;
   final String email;
 
   Contacto({
@@ -15,7 +12,6 @@ class Contacto {
     required this.apellido,
     required this.telefono,
     this.domicilio,
-    this.genero,
     required this.email,
   });
 
@@ -25,7 +21,6 @@ class Contacto {
     required this.apellido,
     required this.telefono,
     this.domicilio,
-    this.genero,
     required this.email,
   });
 
@@ -43,14 +38,12 @@ class Contacto {
     String? apellido,
     String? telefono,
     String? domicilio,
-    Genero? genero,
     String? email,
   }) => Contacto(
     nombre: this.nombre,
     apellido: this.apellido,
     telefono: this.telefono,
     domicilio: this.domicilio,
-    genero: this.genero,
     email: this.email
   );
 
@@ -60,12 +53,11 @@ class Contacto {
     "apellido": apellido,
     "telefono": telefono,
     "domicilio": domicilio,
-    "genero": genero.toString(),
     "email": email
   };
 
   @override
   String toString() {
-    return '{id: $id,nombre: $nombre, apellido: $apellido, telefono: $telefono, domicilio: $domicilio, genero: $genero, email: $email}  \n';
+    return '{id: $id,nombre: $nombre, apellido: $apellido, telefono: $telefono, domicilio: $domicilio, email: $email}  \n';
   }
 }
